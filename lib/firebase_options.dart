@@ -49,7 +49,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '565252686140',
     projectId: 'new-folder-929c7',
     authDomain: 'new-folder-929c7.firebaseapp.com',
-    databaseURL: 'https://new-folder-929c7-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://new-folder-929c7-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'new-folder-929c7.appspot.com',
     measurementId: 'G-WFL6Z71FB3',
   );
@@ -59,7 +60,8 @@ class DefaultFirebaseOptions {
     appId: '1:565252686140:android:58db6b796ea1e21a841e39',
     messagingSenderId: '565252686140',
     projectId: 'new-folder-929c7',
-    databaseURL: 'https://new-folder-929c7-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://new-folder-929c7-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'new-folder-929c7.appspot.com',
   );
 
@@ -68,9 +70,11 @@ class DefaultFirebaseOptions {
     appId: '1:565252686140:ios:5670ff727a0d0083841e39',
     messagingSenderId: '565252686140',
     projectId: 'new-folder-929c7',
-    databaseURL: 'https://new-folder-929c7-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://new-folder-929c7-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'new-folder-929c7.appspot.com',
-    iosClientId: '565252686140-9jlh3puu5aksoamnvs85l6fal140une3.apps.googleusercontent.com',
+    iosClientId:
+        '565252686140-9jlh3puu5aksoamnvs85l6fal140une3.apps.googleusercontent.com',
     iosBundleId: 'com.example.flutterApplication1',
   );
 
@@ -79,9 +83,11 @@ class DefaultFirebaseOptions {
     appId: '1:565252686140:ios:5670ff727a0d0083841e39',
     messagingSenderId: '565252686140',
     projectId: 'new-folder-929c7',
-    databaseURL: 'https://new-folder-929c7-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://new-folder-929c7-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'new-folder-929c7.appspot.com',
-    iosClientId: '565252686140-9jlh3puu5aksoamnvs85l6fal140une3.apps.googleusercontent.com',
+    iosClientId:
+        '565252686140-9jlh3puu5aksoamnvs85l6fal140une3.apps.googleusercontent.com',
     iosBundleId: 'com.example.flutterApplication1',
   );
 }
