@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/auth/auth_service.dart';
+import 'package:flutter_application_1/utilities/generics/get_argument.dart';
 import '../../services/crud/notes_service.dart';
 
-class NewNoteView extends StatefulWidget {
-  const NewNoteView({Key? key}) : super(key: key);
+class CreateUpdateNoteView extends StatefulWidget {
+  const CreateUpdateNoteView({Key? key}) : super(key: key);
 
   @override
-  State<NewNoteView> createState() => _NewNoteViewState();
+  State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
 }
 
-class _NewNoteViewState extends State<NewNoteView> {
+class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   DatabaseNote? _note; // keep hold of our current note so we dont recreate it
   late final NotesService _notesService; //keep hold of our noteService
   late final TextEditingController _textController;
@@ -39,7 +40,14 @@ class _NewNoteViewState extends State<NewNoteView> {
     _textController.addListener(_textControllerListener);
   }
 
-  Future<DatabaseNote> createNewNote() async {
+  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
+    final widgetNote = context.getArgument<DatabaseNote>();
+    if (widgetNote != null) {
+      _note = widgetNote; // Textfield should be prepopulated with original note
+      _textController.text = widgetNote.text; // set the text
+      return widgetNote;
+    }
+
     // creating our note
     final existingNote = _note; // Have we created this note before
     if (existingNote != null) {
@@ -52,8 +60,10 @@ class _NewNoteViewState extends State<NewNoteView> {
         currentUser.email!; // extract the email from current user + unwrap
     final owner =
         await _notesService.getUser(email: email); // get owner from databse.
-    return await _notesService.createNote(
+    final newNote = await _notesService.createNote(
         owner: owner); //create note with that owner
+    _note = newNote;
+    return newNote;
   }
 
   void _deleteNoteIfTextIsEmpty() {
@@ -91,11 +101,10 @@ class _NewNoteViewState extends State<NewNoteView> {
         title: const Text('New Notes'),
       ),
       body: FutureBuilder(
-        future: createNewNote(),
+        future: createOrGetExistingNote(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              _note = snapshot.data as DatabaseNote?;
               _setupTextControllerListener(); // get notes from snapshot
               return TextField(
                 controller: _textController,

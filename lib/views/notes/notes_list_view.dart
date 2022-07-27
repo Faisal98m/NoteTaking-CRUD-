@@ -3,17 +3,20 @@ import '../../services/crud/notes_service.dart';
 import '../../utilities/dialog/delete_dialog.dart';
 
 //callback definition
-typedef DeleteNoteCallBack = void Function(DatabaseNote note); //
+typedef NoteCallback = void Function(
+    DatabaseNote note); // we could tell notes view to delete a note
 
 class NotesListView extends StatelessWidget {
   final List<DatabaseNote> notes; //Notes wants a list of notes to display
-  final DeleteNoteCallBack onDeleteNote;
+  final NoteCallback onDeleteNote;
   //call a function thats going to call a delete dialog
+  final NoteCallback onTap;
 
   const NotesListView({
     Key? key,
     required this.notes,
     required this.onDeleteNote,
+    required this.onTap,
   }) : super(key: key);
 
   @override
@@ -23,6 +26,9 @@ class NotesListView extends StatelessWidget {
         itemBuilder: (context, index) {
           final note = notes[index];
           return ListTile(
+            onTap: (() {
+              onTap(note);
+            }),
             title: Text(
               note.text,
               maxLines: 1,
