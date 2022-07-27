@@ -50,8 +50,10 @@ class NotesService {
     _notesStreamController.add(_notes); //
   }
 
-  Future<DatabaseNote> updateNote(
-      {required DatabaseNote note, required String text}) async {
+  Future<DatabaseNote> updateNote({
+    required DatabaseNote note,
+    required String text,
+  }) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
@@ -61,7 +63,6 @@ class NotesService {
     //update db
     final updatesCount = await db.update(noteTable, {
       textColumn: text,
-      isSyncedWithCloudColumn: 0,
     });
 
     if (updatesCount == 0) {
@@ -152,14 +153,12 @@ class NotesService {
       //reutrns id
       userIdColumn: owner.id,
       textColumn: text,
-      isSyncedWithCloudColumn: 1,
     });
 
     final note = DatabaseNote(
       id: noteId,
       userId: owner.id,
       text: text,
-      isSyncedWithCloud: true,
     );
     _notes.add(note); // read the notes inside the user
     _notesStreamController.add(
@@ -311,25 +310,21 @@ class DatabaseNote {
   final int id;
   final int userId;
   final String text;
-  final bool isSyncedWithCloud;
 
-  const DatabaseNote(
-      { //initializer
-      required this.id,
-      required this.userId,
-      required this.text,
-      required this.isSyncedWithCloud});
+  const DatabaseNote({
+    //initializer
+    required this.id,
+    required this.userId,
+    required this.text,
+  });
 
   DatabaseNote.fromRow(Map<String, Object?> map) //instantiate from row
       : id = map[idColumn] as int,
         userId = map[userIdColumn] as int,
-        text = map[textColumn] as String,
-        isSyncedWithCloud =
-            (map[isSyncedWithCloudColumn] as int) == 1 ? true : false;
+        text = map[textColumn] as String;
 
   @override
-  String toString() =>
-      'Note, ID= $id, userId= $userId, syncedWithCloud = $isSyncedWithCloud';
+  String toString() => 'Note, ID= $id, userId= $userId, text = $text';
 
   @override // equality behaviour to see if two people are equal to eachother
   bool operator ==(covariant DatabaseNote other) =>
@@ -346,20 +341,18 @@ const noteTable = 'note';
 const userTable = 'user';
 const idColumn = 'id';
 const emailColumn = 'email';
-const userIdColumn = 'userId';
+const userIdColumn = 'user_id';
 const textColumn = 'text';
-const isSyncedWithCloudColumn = 'isSyncedWithCloud';
 const createUserTable = '''CREATE TABLE IF NOT EXISTS "User" (
 	"id"	INTEGER NOT NULL,
 	"email"	INTEGER NOT NULL UNIQUE,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 ''';
-const createNoteTable = '''CREATE TABLE IF NOT EXISTS "notes" (
+const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
 	"id"	INTEGER NOT NULL,
 	"user_id"	INTEGER NOT NULL,
 	"text"	TEXT,
-	"is_synced_cloud"	INTEGER DEFAULT 0,
 	PRIMARY KEY("id"),
 	FOREIGN KEY("user_id") REFERENCES "User"("id")
 );
