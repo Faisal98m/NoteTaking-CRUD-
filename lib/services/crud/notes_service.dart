@@ -303,8 +303,9 @@ class NotesService {
 
 @immutable
 class DatabaseUser {
-  final int id;
-  final String email;
+  // Create User Table
+  final int id; //with id
+  final String email; // with email
   const DatabaseUser({
     // constructor
     required this.id, // named parameters
