@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/auth/auth_service.dart';
 import 'package:flutter_application_1/utilities/generics/get_argument.dart';
-import '../../services/crud/notes_service.dart';
+import 'package:flutter_application_1/services/cloud/cloud_note.dart';
+import 'package:flutter_application_1/services/cloud/firebase_cloud_storage.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../../utilities/dialog/cannot_share_empty_note.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
   const CreateUpdateNoteView({Key? key}) : super(key: key);
@@ -11,13 +15,13 @@ class CreateUpdateNoteView extends StatefulWidget {
 }
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
-  DatabaseNote? _note; // keep hold of our current note so we dont recreate it
-  late final NotesService _notesService; //keep hold of our noteService
+  CloudNote? _note; // keep hold of our current note so we dont recreate it
+  late final FirebaseCloudStorage _notesService; //keep hold of our noteService
   late final TextEditingController _textController;
 
   @override
   void initState() {
-    _notesService = NotesService();
+    _notesService = FirebaseCloudStorage();
     _textController = TextEditingController();
     super.initState();
   }
@@ -30,8 +34,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     }
     final text = _textController.text;
     await _notesService.updateNote(
-      note: note,
       text: text,
+      documentId: note.documentId,
     );
   }
 
@@ -40,8 +44,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     _textController.addListener(_textControllerListener);
   }
 
-  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
-    final widgetNote = context.getArgument<DatabaseNote>();
+  Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
+    final widgetNote = context.getArgument<CloudNote>();
     if (widgetNote != null) {
       _note = widgetNote; // Textfield should be prepopulated with original note
       _textController.text = widgetNote.text; // set the text
@@ -56,12 +60,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     } // if we dont then we create a new note
     final currentUser =
         AuthService.firebase().currentUser!; //retrieve the user from firebase
-    final email =
-        currentUser.email!; // extract the email from current user + unwrap
-    final owner =
-        await _notesService.getUser(email: email); // get owner from databse.
-    final newNote = await _notesService.createNote(
-        owner: owner); //create note with that owner
+    final userId = currentUser.id;
+    final newNote = await _notesService.createNewNote(
+        ownerUserId: userId); //create note with that owner
     _note = newNote;
     return newNote;
   }
@@ -71,7 +72,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     if (_textController.text.isEmpty && note != null) {
       //if the text is empty and the note is not null
       _notesService.deleteNote(
-          id: note.id); // we go to note service and delete note
+          documentId: note.documentId); // we go to note service and delete note
     }
   }
 
@@ -80,8 +81,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     final text = _textController.text;
     if (note != null && text.isNotEmpty) {
       await _notesService.updateNote(
-        note: note,
         text: text,
+        documentId: note.documentId,
       );
     }
   }
@@ -99,6 +100,18 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Notes'),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                final text = _textController.text;
+                if (_note == null || text.isEmpty) {
+                  await showCannotShareEmptyNotesDialog(context);
+                } else {
+                  Share.share(text);
+                }
+              },
+              icon: const Icon(Icons.share))
+        ],
       ),
       body: FutureBuilder(
         future: createOrGetExistingNote(context),

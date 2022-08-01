@@ -4,8 +4,8 @@ import 'package:flutter_application_1/services/cloud/cloud_storage_constants.dar
 import 'package:flutter_application_1/services/cloud/cloud_storage_exceptions.dart';
 
 class FirebaseCloudStorage {
-  final notes = FirebaseFirestore.instance
-      .collection('notes'); // how we're going to talk with firestore
+  final notes = FirebaseFirestore.instance.collection(
+      'notes'); // how we're going to talk with firestore/ a collection ref called notes
 
   Future<void> deleteNote({required String documentId}) async {
     try {
@@ -44,30 +44,30 @@ class FirebaseCloudStorage {
           )
           .get()
           .then(
-            (value) => value.docs.map(
-              (doc) {
-                return CloudNote(
-                  documentId: doc.id,
-                  ownerUserId: doc.data()[ownerUSerIdFieldName] as String,
-                  text: doc.data()[textFieldName] as String,
-                );
-              },
-            ),
+            (value) => value.docs.map((doc) => CloudNote.fromSnapshot(doc)),
           );
     } catch (e) {
-      throw CouldNotCreateNoteException();
+      throw CouldNotGetAllNotes();
     }
   }
 
+//make firebase a singleton
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._sharedInstance();
-  FirebaseCloudStorage._sharedInstance();
-  factory FirebaseCloudStorage() => _shared;
+  FirebaseCloudStorage._sharedInstance(); // private constructor
+  factory FirebaseCloudStorage() =>
+      _shared; // factory constructor which talks to a static final field(_shared)
 
-  void createNewNote({required String ownerUserId}) async {
-    await notes.add({
+  Future<CloudNote> createNewNote({required String ownerUserId}) async {
+    final document = await notes.add({
       ownerUSerIdFieldName: ownerUserId,
       textFieldName: '',
     });
+    final fetchedNote = await document.get();
+    return CloudNote(
+      documentId: fetchedNote.id,
+      ownerUserId: ownerUserId,
+      text: '',
+    );
   }
 }
