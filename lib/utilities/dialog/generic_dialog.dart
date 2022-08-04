@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 typedef DialogOptionBuilder<T> = Map<String,
         T?> //<T> insures that every string is unique so that two strings dont have the same title
-    Function(); //user specifies a lsit of buttons and every button has to have a value
+    Function(); //user specifies a list of buttons and every button has to have a value
 
 Future<T?> showGenericDialog<T>({
   //

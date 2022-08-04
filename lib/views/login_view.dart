@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/constants/routes.dart';
 import 'package:flutter_application_1/services/auth/auth_exceptions.dart';
 import 'package:flutter_application_1/services/auth/bloc/auth_event.dart';
 import 'package:flutter_application_1/services/auth/bloc/auth_state.dart';
@@ -19,7 +18,6 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  CloseDialog? _closeDialogHandle;
 
   @override
   void initState() {
@@ -41,17 +39,6 @@ class _LoginViewState extends State<LoginView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
-          final CloseDialog = _closeDialogHandle;
-          if (!state.isLoading && CloseDialog != null) {
-            CloseDialog();
-            _closeDialogHandle = null;
-          } else if (state.isLoading && CloseDialog == null) {
-            _closeDialogHandle = showLoadingDialog(
-              context: context,
-              text: 'Loading...',
-            );
-          }
-
           if (state.exception is UserNotFoundAuthException) {
             await showErrorDialog(context, 'User not found');
           } else if (state.exception is WrongPasswordAuthException) {
